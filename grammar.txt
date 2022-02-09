@@ -1,0 +1,7 @@
+<SEARCH> -> <GROUP-OUT> | <ALL-OUT>
+<GROUP-OUT> -> <TMP>
+EXPR -> <GROUP> 
+<TMP> -> <STRING> | <STRING> + <OPERATOR>
+<OPERATOR> -> <OR> | <REPEAT> | <CATCH> | <DOT> | <COUNTER> | <IGNORE> | <CATCH_OUT>
+<STRING> -> <OP> + <STRING> | <OP>
+<OP> -> [a-z, A-Z, 0-9]
