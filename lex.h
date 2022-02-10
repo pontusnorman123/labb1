@@ -1,24 +1,18 @@
 #ifndef LABB1_LEX_H
 #define LABB1_LEX_H
 
-enum tokens{ID, OR, REPEAT, CATCH, DOT, COUNTER, IGNORE, CATCH_OUT };
+enum tokens{OPERAND, L_PAREN, R_PAREN};
 
-tokens lex(char c){
-    switch(c) {
-        case '+':
-            return OR;
-        case '*':
-            return REPEAT;
-        case '()':
-            return CATCH;
-        case '.':
-            return DOT;
-        case '{}':
-            return COUNTER;
-        case '/I':
-            return IGNORE;
-        case '/O{}':
-            return CATCH_OUT;
+
+template<typename FwdIt>
+tokens lex(FwdIt first){
+    switch(*first) {
+        case '(':
+            first++;
+            return L_PAREN;
+        case ')':
+            first++;
+            return R_PAREN;
     }
 }
 
