@@ -23,6 +23,15 @@ struct GroupOut:ASTNode{
 
 };
 
+struct Group{
+
+};
+
+struct String{
+
+};
+
+
 struct Search:ASTNode{
     bool evaluate() override{
         auto group_out_node = dynamic_cast<GroupOut*>(children[0]);
@@ -36,10 +45,6 @@ struct Expression:ASTNode{
 
 };
 
-
-struct String:ASTNode{
-
-};
 
 
 
