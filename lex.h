@@ -1,6 +1,6 @@
 #ifndef LABB1_LEX_H
 #define LABB1_LEX_H
-
+//Dagens
 #include <iostream>
 #include <stdio.h>
 #include <ctype.h>
