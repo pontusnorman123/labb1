@@ -6,11 +6,11 @@
 #include <ctype.h>
 
 
-enum tokens{OPERAND, L_PAREN, R_PAREN};
+enum tokens{OPERAND, L_PAREN, R_PAREN, END};
 
 
 template<typename IT>
-tokens lex(IT first){
+tokens lex(IT first, IT last){
     switch(*first) {
         case 'T':
             first++;
@@ -36,6 +36,8 @@ tokens lex(IT first){
             std::cout<<"test5" <<std::endl;
 
             return R_PAREN;
+        case last:
+            return END;
     }
 }
 
