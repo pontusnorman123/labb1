@@ -10,22 +10,9 @@ enum tokens{OPERAND, L_PAREN, R_PAREN, END};
 
 
 template<typename IT>
-tokens lex(IT first, IT last){
+tokens lex(IT &first, IT last){
     switch(*first) {
-        case 'T':
-            first++;
-            std::cout<<"test" <<std::endl;
-            return OPERAND;
-        case 'E':
-            first++;
-            std::cout<<"test2" <<std::endl;
 
-            return OPERAND;
-        case 'S':
-            first++;
-            std::cout<<"test3" <<std::endl;
-
-            return OPERAND;
         case '(':
             first++;
             std::cout<<"test4" <<std::endl;
@@ -36,8 +23,14 @@ tokens lex(IT first, IT last){
             std::cout<<"test5" <<std::endl;
 
             return R_PAREN;
-        case last:
-            return END;
+
+        case '\0':
+          return END;
+
+        default:
+            // first++;
+            return OPERAND;
+
     }
 }
 

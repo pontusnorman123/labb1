@@ -4,6 +4,9 @@
 #include <vector>
 #include <string>
 
+extern std::string::const_iterator input_first;
+extern std::string::const_iterator input_last;
+
 std::vector<std::string> search_result;
 
 struct ASTNode{
@@ -15,35 +18,36 @@ struct ASTNode{
 struct Operand:ASTNode{
     char op;
     bool evaluate() override{
+        for(auto it = input_first; it != input_last; it++)
+        {
+            if(*it== op) {
+                return true;
+            }
+        }
 
+        return false;
     }
 };
 
-struct GroupOut:ASTNode{
 
-};
+struct Group:ASTNode{
+bool evaluate() override{
 
-struct Group{
-
-};
-
-struct String{
-
+    return children[0]->evaluate();
+}
 };
 
 
 struct Search:ASTNode{
     bool evaluate() override{
-        auto group_out_node = dynamic_cast<GroupOut*>(children[0]);
-        return
+
+        return children[0]->evaluate();
+
     }
 
 };
 
 
-struct Expression:ASTNode{
-
-};
 
 
 
