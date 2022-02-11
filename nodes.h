@@ -1,6 +1,6 @@
 #ifndef LABB1_NODES_H
 #define LABB1_NODES_H
-//Dagens
+//Dagen
 #include <vector>
 #include <string>
 

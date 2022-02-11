@@ -3,7 +3,7 @@
 
 #include "nodes.h"
 #include "lex.h"
-//Dagens
+//Dagen
 
 template<typename IT>
 Operand* parse_operand(IT &first, IT last){
