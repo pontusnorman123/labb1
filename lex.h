@@ -14,21 +14,13 @@ tokens lex(IT &first, IT last){
     switch(*first) {
 
         case '(':
-            first++;
-            std::cout<<"test4" <<std::endl;
-
             return L_PAREN;
         case ')':
-            first++;
-            std::cout<<"test5" <<std::endl;
-
             return R_PAREN;
 
         case '\0':
           return END;
-
         default:
-            // first++;
             return OPERAND;
 
     }

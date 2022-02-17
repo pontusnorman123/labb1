@@ -7,11 +7,14 @@
 
 template<typename IT>
 Operand* parse_operand(IT &first, IT last){
+
     auto op_token = lex(first, last);
+
     if(op_token != OPERAND)
     {
         return nullptr;
     }
+
     auto p_op = new Operand;
     p_op->op=*first;
     first++;
@@ -19,10 +22,32 @@ Operand* parse_operand(IT &first, IT last){
 }
 
 template<typename IT>
+String* parse_string(IT &first, IT last){
+
+    //Parsa operand
+    Operand* p_lhs = nullptr;
+    p_lhs = parse_operand(first,last);
+
+    //Nästa tecken
+    auto op_token = lex(first,last);
+    String* p_rhs = nullptr;
+
+    if(op_token != OPERAND){
+        return nullptr;
+    }
+    else
+        p_rhs = parse_string(first,last);
+    //
+
+}
+
+template<typename IT>
 Group* parse_group(IT &first, IT last) {
 
-    auto token_LPAREN = lex(first, last);
-    if(token_LPAREN != L_PAREN)
+    auto lparen_token = lex(first, last);
+    first++;
+
+    if(lparen_token!= L_PAREN)
     {
         return nullptr;
     }
@@ -30,14 +55,16 @@ Group* parse_group(IT &first, IT last) {
     Operand* p_rhs = nullptr;
     p_rhs = parse_operand(first, last);
 
-
+    first++;
     auto token_RPAREN = lex(first, last);
+    first++;
+
     if(token_RPAREN != R_PAREN)
     {
         return nullptr;
     }
-    auto p_group = new Group;
 
+    auto p_group = new Group;
     p_group->children.push_back(p_rhs);
     return p_group;
 

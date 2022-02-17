@@ -10,13 +10,16 @@ extern std::string::const_iterator input_last;
 std::vector<std::string> search_result;
 
 struct ASTNode{
+
     bool virtual evaluate() = 0;
     std::vector<ASTNode*> children;
 
 };
 
 struct Operand:ASTNode{
+
     char op;
+
     bool evaluate() override{
         for(auto it = input_first; it != input_last; it++)
         {
@@ -29,16 +32,25 @@ struct Operand:ASTNode{
     }
 };
 
+struct String:ASTNode{
+
+    bool evaluate() override{
+        return children[0]->evaluate();
+    }
+};
+
 
 struct Group:ASTNode{
-bool evaluate() override{
 
-    return children[0]->evaluate();
-}
+    bool evaluate() override{
+
+        return children[0]->evaluate();
+    }
 };
 
 
 struct Search:ASTNode{
+
     bool evaluate() override{
 
         return children[0]->evaluate();
