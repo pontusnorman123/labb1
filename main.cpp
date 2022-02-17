@@ -3,19 +3,18 @@
 #include "nodes.h"
 #include <iostream>
 //Dagen
-std::string input_text = "ES HTIS";
-std::string::const_iterator input_first;
-std::string::const_iterator input_last;
+
 
 int main(){
 
     //search string iterators
-    std::string search_string = "(T)";
+    std::string search_string = "(TE)";
     auto search_string_start = search_string.begin();
     auto search_string_end = search_string.end();
 
-    input_first = input_text.begin();
-    input_last = input_text.end();
+    std::string input_text = "ESASDASD";
+    std::string::const_iterator input_first = input_text.begin();
+    std::string::const_iterator input_last = input_text.end();
     //Input text iterators
     //std::string input_text = "TEST THIS";
     //auto input_text_start = input_text.begin();
@@ -24,14 +23,14 @@ int main(){
 
     auto result = parse_search(search_string_start, search_string_end);
 
-    if(result->evaluate())
+    if(result->evaluate(input_first,input_last))
     {
-        std::cout << "FINNS!";
+        std::cout<<"MATCH";
     }
-    else{
-        std::cout<< "INTE FINNS!";
+    else
+    {
+        std::cout<<"EJ MATCH";
     }
-
 
     //Input test example "lo* could.{3}"
 
