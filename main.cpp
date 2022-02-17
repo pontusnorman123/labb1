@@ -8,11 +8,11 @@
 int main(){
 
     //search string iterators
-    std::string search_string = "(TE)";
+    std::string search_string = "(Wat)";
     auto search_string_start = search_string.begin();
     auto search_string_end = search_string.end();
 
-    std::string input_text = "ESASDASD";
+    std::string input_text = "Waterloo";
     std::string::const_iterator input_first = input_text.begin();
     std::string::const_iterator input_last = input_text.end();
     //Input text iterators

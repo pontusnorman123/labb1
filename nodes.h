@@ -17,21 +17,13 @@ struct ASTNode{
 
 };
 
-struct Operand:ASTNode{
+struct Char:ASTNode{
 
-    char op;
+    char ch;
 
     bool evaluate(std::string::const_iterator first, std::string::const_iterator last) override{
-        return op == *first;
+        return ch == *first;
 
-        for(auto it = first; it != last; it++)
-        {
-            if(*it== op) {
-                return true;
-            }
-        }
-
-        return false;
     }
 };
 
@@ -41,14 +33,20 @@ struct String:ASTNode{
     bool evaluate(std::string::const_iterator first, std::string::const_iterator last) override{
 
         bool rhs = true;
+        bool lhs = children[0]->evaluate(first,last);
+
+        if(!lhs)
+        {
+            return false;
+        }
+
         if(children.size() == 2)
         {
-            children[1]->evaluate(first + 1, last);
+            rhs = children[1]->evaluate(first + 1, last);
         }
-        else
-            rhs = false;
 
-        return rhs && children[0]->evaluate(first,last);
+
+        return lhs && rhs;
     }
 };
 
@@ -58,7 +56,18 @@ struct Group:ASTNode{
     bool evaluate(std::string::const_iterator first, std::string::const_iterator last) override{
 
 
-        return children[0]->evaluate(first,last);
+        for(auto it = first; it != last; it++)
+        {
+            if(children[0]->evaluate(it,last))
+            {
+                return true;
+            }
+        }
+        return false;
+
+        //return children[0]->evaluate(first,last);
+
+        //return children[0]->evaluate(first,last);
     }
 };
 

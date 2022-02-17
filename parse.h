@@ -6,17 +6,17 @@
 //Dagen
 
 template<typename IT>
-Operand* parse_operand(IT &first, IT last){
+Char* parse_operand(IT &first, IT last){
 
     auto op_token = lex(first, last);
 
-    if(op_token != OPERAND)
+    if(op_token != CHAR)
     {
         return nullptr;
     }
 
-    auto p_op = new Operand;
-    p_op->op=*first;
+    auto p_op = new Char;
+    p_op->ch=*first;
     first++;
     return p_op;
 }
@@ -25,7 +25,7 @@ template<typename IT>
 String* parse_string(IT &first, IT last){
 
     //Parsa operand
-    Operand* p_lhs = nullptr;
+    Char* p_lhs = nullptr;
     p_lhs = parse_operand(first,last);
 
 
@@ -35,7 +35,7 @@ String* parse_string(IT &first, IT last){
     auto op_token = lex(first,last);
     String* p_rhs = nullptr;
 
-    if(op_token != OPERAND){
+    if(op_token != CHAR){
         return p_string;
     }
     p_rhs = parse_string(first,last);

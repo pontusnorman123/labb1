@@ -6,7 +6,7 @@
 #include <ctype.h>
 
 
-enum tokens{OPERAND, L_PAREN, R_PAREN, END};
+enum tokens{CHAR, L_PAREN, R_PAREN, END};
 
 
 template<typename IT>
@@ -22,7 +22,7 @@ tokens lex(IT &first, IT last){
         case '\0':
           return END;
         default:
-            return OPERAND;
+            return CHAR;
 
     }
 }

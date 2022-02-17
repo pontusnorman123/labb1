@@ -1,4 +1,4 @@
 <SEARCH> -> <GROUP>
 <GROUP> -> (<STRING>)
-<STRING> -> <OP>[<STRING>]
-<OP> -> [a-z...]
+<STRING> -> <CHAR>[<STRING>]
+<CHAR> -> [a-z...]
