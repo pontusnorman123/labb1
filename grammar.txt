@@ -4,3 +4,12 @@
 <GROUP> -> (<STRING>)
 <STRING> -> <CHAR>[<STRING>]
 <CHAR> -> [a-z...]
+
+Pågående kaos för DOT ej färdigt.. kollar efter metodiken ikväll..
+<SEARCH> -> <EXPR>
+<EXPR> -> <GROUP> | <STRING>
+<GROUP> -> (<STRING>)
+<STRING> -> <CHAR> | [<STRING>] | <DOT>
+<DOT> -> <CHAR>
+<CHAR> -> [a-z, A-Z]
+
