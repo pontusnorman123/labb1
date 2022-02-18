@@ -1,4 +1,6 @@
-<SEARCH> -> <GROUP>
+<SEARCH> -> <EXPR>
+<EXPR> ->[EXPR] <GROUP>|<STRING>
+<GROUP>
 <GROUP> -> (<STRING>)
 <STRING> -> <CHAR>[<STRING>]
 <CHAR> -> [a-z...]

@@ -55,19 +55,7 @@ struct Group:ASTNode{
 
     bool evaluate(std::string::const_iterator first, std::string::const_iterator last) override{
 
-
-        for(auto it = first; it != last; it++)
-        {
-            if(children[0]->evaluate(it,last))
-            {
-                return true;
-            }
-        }
-        return false;
-
-        //return children[0]->evaluate(first,last);
-
-        //return children[0]->evaluate(first,last);
+        return children[0]->evaluate(first,last);
     }
 };
 
@@ -76,6 +64,15 @@ struct Search:ASTNode{
 
     bool evaluate(std::string::const_iterator first, std::string::const_iterator last) override{
 
+        for(; first != last; first++)
+        {
+            if(children[0]->evaluate(first,last))
+            {
+                return true;
+            }
+        }
+        return false;
+        /*
         for(auto child:children){
 
             bool match = children[0]->evaluate(first,last);
@@ -84,7 +81,7 @@ struct Search:ASTNode{
             }
         }
         return true;
-
+        */
     }
 
 };
