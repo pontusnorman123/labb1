@@ -8,12 +8,14 @@ std::vector<std::string> search_result;
 
 struct ASTNode{
 
+
     bool virtual evaluate(std::string::const_iterator first, std::string::const_iterator last) = 0;
     std::vector<ASTNode*> children;
 
     void add(ASTNode* child){
         children.push_back(child);
     }
+
 
 };
 
@@ -22,7 +24,7 @@ struct Char:ASTNode{
     char ch;
 
     bool evaluate(std::string::const_iterator first, std::string::const_iterator last) override{
-        return ch == *first;
+        return ch == *first || ch == '.';
 
     }
 };
@@ -61,6 +63,7 @@ struct Group:ASTNode{
 
 
 struct Search:ASTNode{
+
 
     bool evaluate(std::string::const_iterator first, std::string::const_iterator last) override{
 

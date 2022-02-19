@@ -1,6 +1,10 @@
-<SEARCH> -> <GROUP>
+<SEARCH> -> <ALL-OUT> | <GROUP-OUT>
+<GROUP-OUT> -> <GROUP> [<EXPR>]
+
 <GROUP> -> (<STRING>)
-<STRING> -> <CHAR> | <DOT> [<STRING>]
+<STRING> -> <CHAR> | <DOT> [<STRING>] <REPEAT>
+<DOT> -> <CHAR>
+<REPEAT> -> <CHAR>*
 <CHAR> -> [a-z...]
 
 Pågående kaos för DOT ej färdigt.. kollar efter metodiken ikväll..

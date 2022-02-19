@@ -4,11 +4,35 @@
 #include <iostream>
 //Dagen
 
+/*
+void printTree(const std::string& prefix, ASTNode *node, bool isLeft)
+{
+    if( node != nullptr )
+    {
+        std::cout << prefix;
+
+        std::cout << (isLeft ? "|--" : "L__" );
+
+        // print the value of the node
+        std::cout << node->getNameOfNode() << std::endl;
+
+        // enter the next tree level - left and right branch
+        printTree( prefix + (isLeft ? "|   " : "    "), node->children[0], true);
+        printTree( prefix + (isLeft ? "|   " : "    "), node->children[1], false);
+    }
+}
+
+void printTree(ASTNode* node)
+{
+    printTree("", node, false);
+}
+
+*/
 
 int main(){
 
     //search string iterators
-    std::string search_string = "(loee)";
+    std::string search_string = "lo*";
     auto search_string_start = search_string.begin();
     auto search_string_end = search_string.end();
 
@@ -23,6 +47,7 @@ int main(){
 
     auto result = parse_search(search_string_start, search_string_end);
 
+
     if(result->evaluate(input_first,input_last))
     {
         std::cout<<"MATCH";
@@ -35,3 +60,5 @@ int main(){
     //Input test example "lo* could.{3}"
 
 }
+
+

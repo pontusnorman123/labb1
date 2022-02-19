@@ -6,36 +6,37 @@
 //Dagen
 
 template<typename IT>
-Char* parse_operand(IT &first, IT last){
+Char* parse_char(IT &first, IT last){
 
-    auto op_token = lex(first, last);
+    auto char_token = lex(first, last);
 
-    if(op_token != CHAR)
+    if(char_token !=  CHAR && char_token != DOT)
     {
         return nullptr;
     }
 
-    auto p_op = new Char;
-    p_op->ch=*first;
+    auto p_char = new Char;
+    p_char->ch=*first;
     first++;
-    return p_op;
+    return p_char;
 }
 
 template<typename IT>
 String* parse_string(IT &first, IT last){
 
     //Parsa operand
+
     Char* p_lhs = nullptr;
-    p_lhs = parse_operand(first,last);
+    p_lhs = parse_char(first,last);
 
 
     String* p_string = new String;
     p_string->add(p_lhs);
     //Nästa tecken
-    auto op_token = lex(first,last);
+    auto char_token = lex(first,last);
     String* p_rhs = nullptr;
 
-    if(op_token != CHAR){
+    if(char_token != CHAR && char_token != DOT){
         return p_string;
     }
     p_rhs = parse_string(first,last);
