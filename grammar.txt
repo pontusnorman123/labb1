@@ -1,8 +1,6 @@
-<SEARCH> -> <EXPR>
-<EXPR> ->[EXPR] <GROUP>|<STRING>
-<GROUP>
+<SEARCH> -> <GROUP>
 <GROUP> -> (<STRING>)
-<STRING> -> <CHAR>[<STRING>]
+<STRING> -> <CHAR> | <DOT> [<STRING>]
 <CHAR> -> [a-z...]
 
 Pågående kaos för DOT ej färdigt.. kollar efter metodiken ikväll..
