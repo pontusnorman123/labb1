@@ -37,10 +37,10 @@ String* parse_string(IT &first, IT last){
     String* p_rhs = nullptr;
 
     if(char_token != CHAR && char_token != DOT){
+        p_string->add(p_rhs);
         return p_string;
     }
     p_rhs = parse_string(first,last);
-
     p_string->add(p_rhs);
 
     return p_string;
@@ -50,7 +50,7 @@ template<typename IT>
 Group* parse_group(IT &first, IT last) {
 
     auto lparen_token = lex(first, last);
-
+    first++;
     if(lparen_token!= L_PAREN)
     {
         return nullptr;
@@ -59,6 +59,7 @@ Group* parse_group(IT &first, IT last) {
     String* p_string = nullptr;
     p_string = parse_string(first, last);
     auto token_RPAREN = lex(first, last);
+    first++;
 
     if(token_RPAREN != R_PAREN)
     {
@@ -72,17 +73,55 @@ Group* parse_group(IT &first, IT last) {
 }
 
 template<typename IT>
-Search *parse_search(IT &first, IT last){
+Expr* parse_expression(IT &first, IT last){
+
+    String* p_string = nullptr;
+
+    auto token = lex(first,last);
+    auto p_expr = new Expr;
+
+    if(token == CHAR)
+    {
+        p_string = parse_string(first,last);
+        p_expr->add(p_string);
+        token = lex(first,last);
+
+    }
 
     Group* p_group = nullptr;
+    if(token == L_PAREN) {
+        p_group = parse_group(first,last);
+        p_expr->add(p_group);
+    }
 
+    token = lex(first,last);
+    Expr * p_rhs = nullptr;
+    if(token != END){
+        p_rhs = parse_expression(first,last);
+        p_expr->add(p_rhs);
+    }
 
+    return p_expr;
+}
 
-    p_group = parse_group(first,last);
+template<typename IT>
+GroupOut* parse_groupOut(IT &first, IT last){
 
+    Expr* p_expr = nullptr;
+    p_expr = parse_expression(first,last);
+    auto p_groupOut = new GroupOut;
+    p_groupOut->add(p_expr);
+
+    return p_groupOut;
+};
+
+template<typename IT>
+Search *parse_search(IT &first, IT last){
+
+    GroupOut* p_groupOut = nullptr;
+    p_groupOut = parse_groupOut(first,last);
     auto p_search = new Search;
-
-    p_search->children.push_back(p_group);
+    p_search->add(p_groupOut);
 
     return p_search;
 }

@@ -4,7 +4,7 @@
 #include <iostream>
 //Dagen
 
-/*
+
 void printTree(const std::string& prefix, ASTNode *node, bool isLeft)
 {
     if( node != nullptr )
@@ -14,11 +14,19 @@ void printTree(const std::string& prefix, ASTNode *node, bool isLeft)
         std::cout << (isLeft ? "|--" : "L__" );
 
         // print the value of the node
-        std::cout << node->getNameOfNode() << std::endl;
+        std::cout << node->getNameFromNode() << std::endl;
 
         // enter the next tree level - left and right branch
-        printTree( prefix + (isLeft ? "|   " : "    "), node->children[0], true);
-        printTree( prefix + (isLeft ? "|   " : "    "), node->children[1], false);
+        if(!node->children.empty()){
+
+            printTree( prefix + (isLeft ? "|   " : "    "), node->children[0], true);
+
+        }
+        if(node->children.size() > 1){
+
+            printTree( prefix + (isLeft ? "|   " : "    "), node->children[1], false);
+
+        }
     }
 }
 
@@ -27,12 +35,12 @@ void printTree(ASTNode* node)
     printTree("", node, false);
 }
 
-*/
+
 
 int main(){
 
     //search string iterators
-    std::string search_string = "lo*";
+    std::string search_string = "Water(loo)";
     auto search_string_start = search_string.begin();
     auto search_string_end = search_string.end();
 
@@ -56,6 +64,9 @@ int main(){
     {
         std::cout<<"EJ MATCH";
     }
+    std::cout<<std::endl;
+    printTree(result);
+
 
     //Input test example "lo* could.{3}"
 

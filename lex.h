@@ -14,7 +14,6 @@ tokens lex(IT &first, IT last){
     switch(*first) {
 
         case '(':
-            first++;
             return L_PAREN;
         case ')':
             return R_PAREN;

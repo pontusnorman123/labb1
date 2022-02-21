@@ -1,5 +1,6 @@
 <SEARCH> -> <ALL-OUT> | <GROUP-OUT>
-<GROUP-OUT> -> <GROUP> [<EXPR>]
+<ALL-OUT> -> <EXPR>
+<EXPR> ->  <GROUP> | <STRING> [<EXPR>]
 
 <GROUP> -> (<STRING>)
 <STRING> -> <CHAR> | <DOT> [<STRING>] <REPEAT>

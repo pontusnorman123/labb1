@@ -13,9 +13,14 @@ struct ASTNode{
     std::vector<ASTNode*> children;
 
     void add(ASTNode* child){
-        children.push_back(child);
+        if(child != nullptr)
+        {
+            children.push_back(child);
+        }
     }
 
+
+    std::string virtual getNameFromNode() = 0;
 
 };
 
@@ -27,10 +32,17 @@ struct Char:ASTNode{
         return ch == *first || ch == '.';
 
     }
+
+    std::string getNameFromNode() override{
+        return std::string(1,ch);
+    }
 };
 
 struct String:ASTNode{
 
+    std::string getNameFromNode() override{
+        return "STRING";
+    }
 
     bool evaluate(std::string::const_iterator first, std::string::const_iterator last) override{
 
@@ -55,14 +67,46 @@ struct String:ASTNode{
 
 struct Group:ASTNode{
 
+    std::string getNameFromNode() override{
+        return "GROUP";
+    }
+
     bool evaluate(std::string::const_iterator first, std::string::const_iterator last) override{
 
         return children[0]->evaluate(first,last);
     }
 };
 
+struct Expr:ASTNode{
+
+    std::string getNameFromNode() override{
+        return "EXPR";
+    }
+
+
+    bool evaluate(std::string::const_iterator first, std::string::const_iterator last) override{
+        return children[0]->evaluate(first,last);
+    }
+};
+
+struct GroupOut:ASTNode{
+
+    std::string getNameFromNode() override{
+        return "GROUP-OUT";
+    }
+
+
+    bool evaluate(std::string::const_iterator first, std::string::const_iterator last) override{
+        return children[0]->evaluate(first,last);
+    }
+};
+
 
 struct Search:ASTNode{
+
+    std::string getNameFromNode() override{
+        return "SEARCH";
+    }
 
 
     bool evaluate(std::string::const_iterator first, std::string::const_iterator last) override{
