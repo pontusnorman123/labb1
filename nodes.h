@@ -38,6 +38,41 @@ struct Char:ASTNode{
     }
 };
 
+struct Repeat:ASTNode{
+
+    bool evaluate(std::string::const_iterator first, std::string::const_iterator last) override{
+
+        bool lhs = children[0]->evaluate(first,last);
+
+        while(children[0]->evaluate(first,last))
+        {
+            first++;
+        }
+        //Pekarn hoppar ett steg för mkt
+        first--;
+
+        bool rhs = true;
+
+        if(!lhs)
+        {
+            return false;
+        }
+
+        if(children.size() == 2)
+        {
+            rhs = children[1]->evaluate(first + 1, last);
+        }
+
+        return lhs && rhs;
+
+
+    }
+
+    std::string getNameFromNode() override{
+        return "REPEAT";
+    }
+};
+
 struct String:ASTNode{
 
     std::string getNameFromNode() override{
@@ -89,10 +124,10 @@ struct Expr:ASTNode{
     }
 };
 
-struct GroupOut:ASTNode{
+struct AllOut:ASTNode{
 
     std::string getNameFromNode() override{
-        return "GROUP-OUT";
+        return "All-OUT";
     }
 
 

@@ -3,9 +3,9 @@
 <EXPR> ->  <GROUP> | <STRING> [<EXPR>]
 
 <GROUP> -> (<STRING>)
-<STRING> -> <CHAR> | <DOT> [<STRING>] <REPEAT>
+<STRING> -> <CHAR> | <DOT> [<STRING>] [<REPEAT>]
 <DOT> -> <CHAR>
-<REPEAT> -> <CHAR>*
+<REPEAT> -> <CHAR>[<STRING>]
 <CHAR> -> [a-z...]
 
 Pågående kaos för DOT ej färdigt.. kollar efter metodiken ikväll..

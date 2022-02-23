@@ -5,12 +5,19 @@
 #include "lex.h"
 //Dagen
 
+
+template<typename IT>
+Repeat* parse_repeat(IT &first, IT last);
+
+template<typename IT>
+String* parse_string(IT &first, IT last);
+
 template<typename IT>
 Char* parse_char(IT &first, IT last){
 
     auto char_token = lex(first, last);
 
-    if(char_token !=  CHAR && char_token != DOT)
+    if(char_token !=  CHAR && char_token != DOT && char_token != REPEAT)
     {
         return nullptr;
     }
@@ -22,26 +29,68 @@ Char* parse_char(IT &first, IT last){
 }
 
 template<typename IT>
-String* parse_string(IT &first, IT last){
+Repeat* parse_repeat(IT &first, IT last){
 
-    //Parsa operand
+    ASTNode* p_lhs = parse_char(first,last);
 
-    Char* p_lhs = nullptr;
-    p_lhs = parse_char(first,last);
+    Repeat* p_repeat = new Repeat;
+    p_repeat->add(p_lhs);
+    //Hoppa över stjärna
+    first++;
 
-
-    String* p_string = new String;
-    p_string->add(p_lhs);
-    //Nästa tecken
-    auto char_token = lex(first,last);
+    auto token = lex(first,last);
     String* p_rhs = nullptr;
 
-    if(char_token != CHAR && char_token != DOT){
+    if(token != CHAR && token != DOT && token != REPEAT){
+        p_repeat->add(p_rhs);
+        return p_repeat;
+    }
+    p_rhs = parse_string(first,last);
+    p_repeat->add(p_rhs);
+
+    return p_repeat;
+}
+
+template<typename IT>
+String* parse_string(IT &first, IT last){
+
+    String* p_string = new String;
+    ASTNode* p_lhs;
+
+    auto tmp = first;
+    auto next_token = lex(++tmp, last);
+    if(next_token == REPEAT)
+    {
+        p_lhs = parse_repeat(first,last);
+        p_string->add(p_lhs);
+    }
+
+
+    p_lhs = parse_char(first,last);
+    p_string->add(p_lhs);
+
+
+    auto token = lex(first,last);
+    ASTNode* p_rhs = nullptr;
+
+    if(token != CHAR && token != DOT && token != REPEAT){
         p_string->add(p_rhs);
         return p_string;
     }
-    p_rhs = parse_string(first,last);
-    p_string->add(p_rhs);
+
+    tmp = first;
+    next_token = lex(++tmp, last);
+    if(next_token == REPEAT)
+    {
+        p_lhs = parse_repeat(first,last);
+        p_string->add(p_lhs);
+    }
+    else
+    {
+        p_rhs = parse_string(first,last);
+        p_string->add(p_rhs);
+    }
+
 
     return p_string;
 }
@@ -80,7 +129,7 @@ Expr* parse_expression(IT &first, IT last){
     auto token = lex(first,last);
     auto p_expr = new Expr;
 
-    if(token == CHAR)
+    if(token == CHAR || token == DOT)
     {
         p_string = parse_string(first,last);
         p_expr->add(p_string);
@@ -88,9 +137,9 @@ Expr* parse_expression(IT &first, IT last){
 
     }
 
-    Group* p_group = nullptr;
+
     if(token == L_PAREN) {
-        p_group = parse_group(first,last);
+        Group* p_group = parse_group(first,last);
         p_expr->add(p_group);
     }
 
@@ -105,23 +154,22 @@ Expr* parse_expression(IT &first, IT last){
 }
 
 template<typename IT>
-GroupOut* parse_groupOut(IT &first, IT last){
+AllOut* parse_AllOut(IT &first, IT last){
 
     Expr* p_expr = nullptr;
     p_expr = parse_expression(first,last);
-    auto p_groupOut = new GroupOut;
-    p_groupOut->add(p_expr);
+    auto p_AllOut = new AllOut;
+    p_AllOut->add(p_expr);
 
-    return p_groupOut;
+    return p_AllOut;
 };
 
 template<typename IT>
 Search *parse_search(IT &first, IT last){
 
-    GroupOut* p_groupOut = nullptr;
-    p_groupOut = parse_groupOut(first,last);
+    AllOut* p_AllOut = parse_AllOut(first,last);
     auto p_search = new Search;
-    p_search->add(p_groupOut);
+    p_search->add(p_AllOut);
 
     return p_search;
 }
