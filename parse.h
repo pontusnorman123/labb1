@@ -13,6 +13,9 @@ template<typename IT>
 String* parse_string(IT &first, IT last);
 
 template<typename IT>
+Expr* parse_expression(IT &first, IT last);
+
+template<typename IT>
 Char* parse_char(IT &first, IT last){
 
     auto char_token = lex(first, last);
@@ -98,15 +101,17 @@ String* parse_string(IT &first, IT last){
 template<typename IT>
 Group* parse_group(IT &first, IT last) {
 
-    auto lparen_token = lex(first, last);
+    auto token = lex(first, last);
     first++;
-    if(lparen_token!= L_PAREN)
+    if(token!= L_PAREN)
     {
         return nullptr;
     }
 
     String* p_string = nullptr;
     p_string = parse_string(first, last);
+    auto p_group = new Group;
+    p_group->add(p_string);
     auto token_RPAREN = lex(first, last);
     first++;
 
@@ -115,8 +120,16 @@ Group* parse_group(IT &first, IT last) {
         return nullptr;
     }
 
-    auto p_group = new Group;
-    p_group->children.push_back(p_string);
+    token = lex(first,last);
+
+    /*
+    if(token != END)
+    {
+        auto p_expr = parse_expression(first,last);
+        p_group->add(p_expr);
+
+    }
+    */
     return p_group;
 
 }
@@ -133,10 +146,12 @@ Expr* parse_expression(IT &first, IT last){
     {
         p_string = parse_string(first,last);
         p_expr->add(p_string);
-        token = lex(first,last);
+        Expr* p_rhs = parse_expression(first,last);
+        p_expr->add(p_rhs);
 
     }
 
+    //parse_expression(first,last);
 
     if(token == L_PAREN) {
         Group* p_group = parse_group(first,last);

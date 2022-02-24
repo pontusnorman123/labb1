@@ -2,7 +2,7 @@
 <ALL-OUT> -> <EXPR>
 <EXPR> ->  <GROUP> | <STRING> [<EXPR>]
 
-<GROUP> -> (<STRING>)
+<GROUP> -> (<STRING>)<EXPR>
 <STRING> -> <CHAR> | <DOT> [<STRING>] [<REPEAT>]
 <DOT> -> <CHAR>
 <REPEAT> -> <CHAR>[<STRING>]

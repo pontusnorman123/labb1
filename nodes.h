@@ -106,9 +106,9 @@ struct Group:ASTNode{
         return "GROUP";
     }
 
-    bool evaluate(std::string::const_iterator first, std::string::const_iterator last) override{
+    bool evaluate(std::string::const_iterator first, std::string::const_iterator last) override {
 
-        return children[0]->evaluate(first,last);
+         return children[0]->evaluate(first, last);
     }
 };
 
@@ -120,8 +120,23 @@ struct Expr:ASTNode{
 
 
     bool evaluate(std::string::const_iterator first, std::string::const_iterator last) override{
-        return children[0]->evaluate(first,last);
+        bool rhs = true;
+        bool lhs = children[0]->evaluate(first,last);
+
+        if(!lhs)
+        {
+            return false;
+        }
+
+        if(children.size() == 2)
+        {
+            rhs = children[1]->evaluate(first + 1, last);
+        }
+
+
+        return lhs && rhs;
     }
+
 };
 
 struct AllOut:ASTNode{
