@@ -40,13 +40,13 @@ void printTree(ASTNode* node)
 int main(){
 
     //search string iterators
-    std::string search_string = "a(te)(rloo)";
+    std::string search_string = "WA\\I";
     auto search_string_start = search_string.begin();
     auto search_string_end = search_string.end();
 
     std::string input_text = "aterloo";
-    std::string::const_iterator input_first = input_text.begin();
-    std::string::const_iterator input_last = input_text.end();
+    std::string::iterator input_first = input_text.begin();
+    std::string::iterator input_last = input_text.end();
     //Input text iterators
     //std::string input_text = "TEST THIS";
     //auto input_text_start = input_text.begin();
@@ -65,6 +65,7 @@ int main(){
         std::cout<<"EJ MATCH";
     }
     std::cout<<std::endl;
+
     printTree(result);
 
 

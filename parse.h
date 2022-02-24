@@ -135,34 +135,122 @@ Group* parse_group(IT &first, IT last) {
 }
 
 template<typename IT>
+IgnoreCaseChar* parse_ignore_case_char(IT &first,IT last){
+
+    auto char_token = lex(first, last);
+
+    if(char_token !=  CHAR && char_token != DOT && char_token != REPEAT)
+    {
+        return nullptr;
+    }
+
+    auto p_char = new IgnoreCaseChar;
+    p_char->ch=tolower(*first);
+    first++;
+    return p_char;
+}
+
+template<typename IT>
+IgnoreCaseString* parse_ignore_case_string(IT &first,IT last)
+{
+    IgnoreCaseString* p_string = new IgnoreCaseString;
+    ASTNode* p_lhs;
+
+    auto tmp = first;
+    auto next_token = lex(++tmp, last);
+    if(next_token == REPEAT)
+    {
+        p_lhs = parse_repeat(first,last);
+        p_string->add(p_lhs);
+    }
+
+
+    p_lhs = parse_ignore_case_char(first,last);
+    p_string->add(p_lhs);
+
+
+    auto token = lex(first,last);
+    ASTNode* p_rhs = nullptr;
+
+    if(token != CHAR && token != DOT && token != REPEAT){
+        p_string->add(p_rhs);
+        return p_string;
+    }
+
+    tmp = first;
+    next_token = lex(++tmp, last);
+    if(next_token == REPEAT)
+    {
+        p_lhs = parse_repeat(first,last);
+        p_string->add(p_lhs);
+    }
+    else
+    {
+        p_rhs = parse_ignore_case_string(first,last);
+        p_string->add(p_rhs);
+    }
+
+
+    return p_string;
+}
+
+template<typename IT>
+IgnoreCase* parse_ignore_case(IT &first, IT last){
+
+    IgnoreCase* p_ignore= new IgnoreCase;
+    auto p_string = parse_ignore_case_string(first,last);
+    p_ignore->add(p_string);
+}
+
+
+template<typename IT>
 Expr* parse_expression(IT &first, IT last){
 
     String* p_string = nullptr;
 
     auto token = lex(first,last);
     auto p_expr = new Expr;
+    bool ignore = false;
 
-    if(token == CHAR || token == DOT)
+    for(auto i = first; i != last; i++)
     {
-        p_string = parse_string(first,last);
-        p_expr->add(p_string);
-        Expr* p_rhs = parse_expression(first,last);
-        p_expr->add(p_rhs);
-
+        token = lex(i,last);
+        if(token == IGNORE_CASE){
+            ignore = true;
+        }
     }
 
-    //parse_expression(first,last);
-
-    if(token == L_PAREN) {
-        Group* p_group = parse_group(first,last);
-        p_expr->add(p_group);
+    if(ignore)
+    {
+        parse_ignore_case_string(first,last);
     }
+    else
+    {
+        if(token == CHAR || token == DOT)
+        {
+            p_string = parse_string(first,last);
+            p_expr->add(p_string);
 
-    token = lex(first,last);
-    Expr * p_rhs = nullptr;
-    if(token != END){
-        p_rhs = parse_expression(first,last);
-        p_expr->add(p_rhs);
+            token = lex(first,last);
+            if(token != END)
+            {
+                Expr* p_rhs = parse_expression(first,last);
+                p_expr->add(p_rhs);
+            }
+
+        }
+
+        if(token == L_PAREN) {
+            Group* p_group = parse_group(first,last);
+            p_expr->add(p_group);
+        }
+
+        token = lex(first,last);
+        Expr * p_rhs = nullptr;
+        if(token != END){
+            p_rhs = parse_expression(first,last);
+            p_expr->add(p_rhs);
+        }
     }
 
     return p_expr;

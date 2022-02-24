@@ -6,7 +6,7 @@
 #include <ctype.h>
 
 
-enum tokens{CHAR, L_PAREN, R_PAREN, END, DOT, REPEAT};
+enum tokens{CHAR, L_PAREN, R_PAREN, END, DOT, REPEAT, IGNORE_CASE, CATCH_GROUP};
 
 
 template<typename IT>
@@ -23,6 +23,14 @@ tokens lex(IT &first, IT last){
             return DOT;
         case '*':
             return REPEAT;
+        case '\\': {
+            auto token = lex(first, last);
+            if (*(first + 1) == 'I') {
+                return IGNORE_CASE;
+            }
+            return CATCH_GROUP;
+            }
+
         default:
             return CHAR;
 

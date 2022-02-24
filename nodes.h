@@ -9,7 +9,7 @@ std::vector<std::string> search_result;
 struct ASTNode{
 
 
-    bool virtual evaluate(std::string::const_iterator first, std::string::const_iterator last) = 0;
+    bool virtual evaluate(std::string::iterator &first, std::string::const_iterator last) = 0;
     std::vector<ASTNode*> children;
 
     void add(ASTNode* child){
@@ -28,7 +28,7 @@ struct Char:ASTNode{
 
     char ch;
 
-    bool evaluate(std::string::const_iterator first, std::string::const_iterator last) override{
+    bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
         return ch == *first || ch == '.';
 
     }
@@ -38,9 +38,59 @@ struct Char:ASTNode{
     }
 };
 
+struct IgnoreCaseChar:ASTNode{
+
+    char ch;
+
+    bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
+
+        return ch == tolower(*first) || ch == '.';
+    }
+
+    std::string getNameFromNode() override{
+        return "IGNORE_CASE_CHAR";
+    }
+};
+
+struct IgnoreCaseString:ASTNode{
+    bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
+
+        bool rhs = true;
+        bool lhs = children[0]->evaluate(first,last);
+
+        if(!lhs)
+        {
+            return false;
+        }
+
+        if(children.size() == 2)
+        {
+            rhs = children[1]->evaluate(++first, last);
+        }
+
+
+        return lhs && rhs;
+    }
+
+    std::string getNameFromNode() override{
+        return "IGNORE_CASE_STRING";
+    }
+};
+
+struct IgnoreCase:ASTNode{
+
+    bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
+        return children[0]->evaluate(first,last);
+    }
+
+    std::string getNameFromNode() override{
+        return "IGNORE_CASE";
+    }
+};
+
 struct Repeat:ASTNode{
 
-    bool evaluate(std::string::const_iterator first, std::string::const_iterator last) override{
+    bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
 
         bool lhs = children[0]->evaluate(first,last);
 
@@ -60,7 +110,7 @@ struct Repeat:ASTNode{
 
         if(children.size() == 2)
         {
-            rhs = children[1]->evaluate(first + 1, last);
+            rhs = children[1]->evaluate(++first, last);
         }
 
         return lhs && rhs;
@@ -79,7 +129,7 @@ struct String:ASTNode{
         return "STRING";
     }
 
-    bool evaluate(std::string::const_iterator first, std::string::const_iterator last) override{
+    bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
 
         bool rhs = true;
         bool lhs = children[0]->evaluate(first,last);
@@ -91,7 +141,7 @@ struct String:ASTNode{
 
         if(children.size() == 2)
         {
-            rhs = children[1]->evaluate(first + 1, last);
+            rhs = children[1]->evaluate(++first, last);
         }
 
 
@@ -106,7 +156,7 @@ struct Group:ASTNode{
         return "GROUP";
     }
 
-    bool evaluate(std::string::const_iterator first, std::string::const_iterator last) override {
+    bool evaluate(std::string::iterator &first, std::string::const_iterator last) override {
 
          return children[0]->evaluate(first, last);
     }
@@ -119,7 +169,7 @@ struct Expr:ASTNode{
     }
 
 
-    bool evaluate(std::string::const_iterator first, std::string::const_iterator last) override{
+    bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
         bool rhs = true;
         bool lhs = children[0]->evaluate(first,last);
 
@@ -130,7 +180,7 @@ struct Expr:ASTNode{
 
         if(children.size() == 2)
         {
-            rhs = children[1]->evaluate(first + 1, last);
+            rhs = children[1]->evaluate(++first, last);
         }
 
 
@@ -146,7 +196,7 @@ struct AllOut:ASTNode{
     }
 
 
-    bool evaluate(std::string::const_iterator first, std::string::const_iterator last) override{
+    bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
         return children[0]->evaluate(first,last);
     }
 };
@@ -159,10 +209,11 @@ struct Search:ASTNode{
     }
 
 
-    bool evaluate(std::string::const_iterator first, std::string::const_iterator last) override{
+    bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
 
-        for(; first != last; first++)
+        for(auto it = first; it != last; it++)
         {
+            first = it;
             if(children[0]->evaluate(first,last))
             {
                 return true;
