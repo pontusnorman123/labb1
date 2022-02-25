@@ -24,7 +24,7 @@ tokens lex(IT &first, IT last){
         case '*':
             return REPEAT;
         case '\\': {
-            auto token = lex(first, last);
+
             if (*(first + 1) == 'I') {
                 return IGNORE_CASE;
             }

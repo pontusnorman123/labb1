@@ -16,6 +16,9 @@ template<typename IT>
 Expr* parse_expression(IT &first, IT last);
 
 template<typename IT>
+IgnoreCaseString* parse_ignore_case_string(IT &first,IT last);
+
+template<typename IT>
 Char* parse_char(IT &first, IT last){
 
     auto char_token = lex(first, last);
@@ -151,6 +154,30 @@ IgnoreCaseChar* parse_ignore_case_char(IT &first,IT last){
 }
 
 template<typename IT>
+IgnoreCaseRepeat* parse_ignore_repeat(IT &first, IT last){
+
+    ASTNode* p_lhs = parse_ignore_case_char(first,last);
+
+    IgnoreCaseRepeat* p_repeat = new IgnoreCaseRepeat;
+    p_repeat->add(p_lhs);
+    //Hoppa över stjärna
+    first++;
+
+    auto token = lex(first,last);
+    IgnoreCaseString* p_rhs = nullptr;
+
+    if(token != CHAR && token != DOT && token != REPEAT){
+        p_repeat->add(p_rhs);
+        return p_repeat;
+    }
+    p_rhs = parse_ignore_case_string(first,last);
+    p_repeat->add(p_rhs);
+
+    return p_repeat;
+
+}
+
+template<typename IT>
 IgnoreCaseString* parse_ignore_case_string(IT &first,IT last)
 {
     IgnoreCaseString* p_string = new IgnoreCaseString;
@@ -160,7 +187,7 @@ IgnoreCaseString* parse_ignore_case_string(IT &first,IT last)
     auto next_token = lex(++tmp, last);
     if(next_token == REPEAT)
     {
-        p_lhs = parse_repeat(first,last);
+        p_lhs = parse_ignore_repeat(first,last);
         p_string->add(p_lhs);
     }
 
@@ -181,7 +208,7 @@ IgnoreCaseString* parse_ignore_case_string(IT &first,IT last)
     next_token = lex(++tmp, last);
     if(next_token == REPEAT)
     {
-        p_lhs = parse_repeat(first,last);
+        p_lhs = parse_ignore_repeat(first,last);
         p_string->add(p_lhs);
     }
     else
@@ -200,6 +227,8 @@ IgnoreCase* parse_ignore_case(IT &first, IT last){
     IgnoreCase* p_ignore= new IgnoreCase;
     auto p_string = parse_ignore_case_string(first,last);
     p_ignore->add(p_string);
+
+    return p_ignore;
 }
 
 
@@ -212,7 +241,7 @@ Expr* parse_expression(IT &first, IT last){
     auto p_expr = new Expr;
     bool ignore = false;
 
-    for(auto i = first; i != last; i++)
+    for(auto i = first; i != last - 1; i++)
     {
         token = lex(i,last);
         if(token == IGNORE_CASE){
@@ -220,9 +249,12 @@ Expr* parse_expression(IT &first, IT last){
         }
     }
 
+    token = lex(first,last);
+
     if(ignore)
     {
-        parse_ignore_case_string(first,last);
+        IgnoreCase* p_ignore_case = parse_ignore_case(first,last);
+        p_expr->add(p_ignore_case);
     }
     else
     {
@@ -239,6 +271,8 @@ Expr* parse_expression(IT &first, IT last){
             }
 
         }
+
+        token = lex(first,last);
 
         if(token == L_PAREN) {
             Group* p_group = parse_group(first,last);

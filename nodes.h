@@ -48,7 +48,7 @@ struct IgnoreCaseChar:ASTNode{
     }
 
     std::string getNameFromNode() override{
-        return "IGNORE_CASE_CHAR";
+        return std::string(1,ch);
     }
 };
 
@@ -86,6 +86,41 @@ struct IgnoreCase:ASTNode{
     std::string getNameFromNode() override{
         return "IGNORE_CASE";
     }
+};
+
+struct IgnoreCaseRepeat:ASTNode{
+
+    bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
+
+        bool lhs = children[0]->evaluate(first,last);
+
+        while(children[0]->evaluate(first,last))
+        {
+            first++;
+        }
+        //Pekarn hoppar ett steg för mkt
+        first--;
+
+        bool rhs = true;
+
+        if(!lhs)
+        {
+            return false;
+        }
+
+        if(children.size() == 2)
+        {
+            rhs = children[1]->evaluate(++first, last);
+        }
+
+        return lhs && rhs;
+
+    }
+
+    std::string getNameFromNode() override{
+        return "IGNORE-CASE-REPEAT";
+    }
+
 };
 
 struct Repeat:ASTNode{

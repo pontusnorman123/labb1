@@ -40,11 +40,11 @@ void printTree(ASTNode* node)
 int main(){
 
     //search string iterators
-    std::string search_string = "WA\\I";
+    std::string search_string = "lO*\\I";
     auto search_string_start = search_string.begin();
     auto search_string_end = search_string.end();
 
-    std::string input_text = "aterloo";
+    std::string input_text = "waterloo";
     std::string::iterator input_first = input_text.begin();
     std::string::iterator input_last = input_text.end();
     //Input text iterators
@@ -69,7 +69,8 @@ int main(){
     printTree(result);
 
 
-    //Input test example "lo* could.{3}"
+    //Input test example "lo* could.{3}"*/
+
 
 }
 
