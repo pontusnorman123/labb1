@@ -35,6 +35,39 @@ Char* parse_char(IT &first, IT last){
 }
 
 template<typename IT>
+Counter* parse_counter(IT &first, IT last){
+
+    first++;
+    auto token = lex(first, last);
+    if(token!= L_COUNTER)
+    {
+        return nullptr;
+    }
+
+    first--;
+    Char* p_char = parse_char(first,last);
+    first++;
+    auto p_counter = new Counter;
+    p_counter->add(p_char);
+
+    int tmp = std::stoi(&*first);
+    p_counter->counter = tmp;
+
+    first++;
+
+    auto token_RPAREN = lex(first, last);
+    first++;
+
+    if(token_RPAREN != R_COUNTER)
+    {
+        return nullptr;
+    }
+
+    return p_counter;
+
+}
+
+template<typename IT>
 Repeat* parse_repeat(IT &first, IT last){
 
     ASTNode* p_lhs = parse_char(first,last);
@@ -71,10 +104,21 @@ String* parse_string(IT &first, IT last){
         p_string->add(p_lhs);
     }
 
+    if(next_token == L_COUNTER)
+    {
+        p_lhs = parse_counter(first,last);
+        p_string->add(p_lhs);
+    }
+    else
+    {
+        p_lhs = parse_char(first,last);
+        p_string->add(p_lhs);
+    }
 
+    /*
     p_lhs = parse_char(first,last);
     p_string->add(p_lhs);
-
+    */
 
     auto token = lex(first,last);
     ASTNode* p_rhs = nullptr;
@@ -123,16 +167,6 @@ Group* parse_group(IT &first, IT last) {
         return nullptr;
     }
 
-    token = lex(first,last);
-
-    /*
-    if(token != END)
-    {
-        auto p_expr = parse_expression(first,last);
-        p_group->add(p_expr);
-
-    }
-    */
     return p_group;
 
 }
@@ -175,6 +209,31 @@ IgnoreCaseRepeat* parse_ignore_repeat(IT &first, IT last){
 
     return p_repeat;
 
+}
+
+template<typename IT>
+IgnoreCaseGroup* parse_ignore_case_group(IT &first, IT last){
+
+    auto token = lex(first, last);
+    first++;
+    if(token!= L_PAREN)
+    {
+        return nullptr;
+    }
+
+    IgnoreCaseString* p_string = nullptr;
+    p_string = parse_ignore_case_string(first, last);
+    auto p_group = new IgnoreCaseGroup;
+    p_group->add(p_string);
+    auto token_RPAREN = lex(first, last);
+    first++;
+
+    if(token_RPAREN != R_PAREN)
+    {
+        return nullptr;
+    }
+
+    return p_group;
 }
 
 template<typename IT>
@@ -221,16 +280,64 @@ IgnoreCaseString* parse_ignore_case_string(IT &first,IT last)
     return p_string;
 }
 
+
 template<typename IT>
 IgnoreCase* parse_ignore_case(IT &first, IT last){
 
     IgnoreCase* p_ignore= new IgnoreCase;
-    auto p_string = parse_ignore_case_string(first,last);
+    auto p_string = parse_ignore_case_expr(first,last);
     p_ignore->add(p_string);
 
     return p_ignore;
 }
 
+template<typename IT>
+IgnoreCaseExpr* parse_ignore_case_expr(IT &first, IT last){
+
+    IgnoreCaseString* p_string = nullptr;
+
+    auto token = lex(first,last);
+    auto p_expr = new IgnoreCaseExpr;
+
+
+    if(token == CHAR || token == DOT)
+    {
+        p_string = parse_ignore_case_string(first,last);
+        p_expr->add(p_string);
+
+        token = lex(first,last);
+        if(token != END)
+        {
+            IgnoreCaseExpr* p_rhs = parse_ignore_case_expr(first,last);
+            p_expr->add(p_rhs);
+        }
+
+    }
+
+    token = lex(first,last);
+
+    if(token == L_PAREN) {
+        IgnoreCaseGroup* p_group = parse_ignore_case_group(first,last);
+        p_expr->add(p_group);
+    }
+
+    token = lex(first,last);
+    IgnoreCaseExpr * p_rhs = nullptr;
+
+    if(*first == '\\')
+    {
+        return p_expr;
+    }
+
+    if(token != END){
+        p_rhs = parse_ignore_case_expr(first,last);
+        p_expr->add(p_rhs);
+    }
+
+
+    return p_expr;
+
+}
 
 template<typename IT>
 Expr* parse_expression(IT &first, IT last){
@@ -253,7 +360,7 @@ Expr* parse_expression(IT &first, IT last){
 
     if(ignore)
     {
-        IgnoreCase* p_ignore_case = parse_ignore_case(first,last);
+        IgnoreCaseExpr* p_ignore_case = parse_ignore_case_expr(first,last);
         p_expr->add(p_ignore_case);
     }
     else

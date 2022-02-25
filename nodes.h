@@ -52,6 +52,17 @@ struct IgnoreCaseChar:ASTNode{
     }
 };
 
+struct IgnoreCaseGroup:ASTNode{
+    std::string getNameFromNode() override{
+        return "IGNORE_CASE_GROUP";
+    }
+
+    bool evaluate(std::string::iterator &first, std::string::const_iterator last) override {
+
+        return children[0]->evaluate(first, last);
+    }
+};
+
 struct IgnoreCaseString:ASTNode{
     bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
 
@@ -184,6 +195,32 @@ struct String:ASTNode{
     }
 };
 
+struct Counter:ASTNode{
+
+    int counter;
+
+    bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
+
+        bool lhs = false;
+
+        for(int i = 0; i < counter; i++)
+        {
+            lhs = children[0]->evaluate(first,last);
+            first++;
+        }
+        //pekarn hoppar ett steg för mkt
+        first--;
+
+        return lhs;
+    }
+
+    std::string getNameFromNode() override{
+
+        std::string return_counter = std::to_string(counter);
+        return "COUNTER " + return_counter;
+    }
+};
+
 
 struct Group:ASTNode{
 
@@ -194,6 +231,32 @@ struct Group:ASTNode{
     bool evaluate(std::string::iterator &first, std::string::const_iterator last) override {
 
          return children[0]->evaluate(first, last);
+    }
+};
+
+struct IgnoreCaseExpr:ASTNode{
+
+    std::string getNameFromNode() override{
+        return "IGNORE_CASE_EXPR";
+    }
+
+
+    bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
+        bool rhs = true;
+        bool lhs = children[0]->evaluate(first,last);
+
+        if(!lhs)
+        {
+            return false;
+        }
+
+        if(children.size() == 2)
+        {
+            rhs = children[1]->evaluate(++first, last);
+        }
+
+
+        return lhs && rhs;
     }
 };
 
