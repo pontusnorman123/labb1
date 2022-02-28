@@ -174,9 +174,9 @@ Group* parse_group(IT &first, IT last) {
 template<typename IT>
 IgnoreCaseChar* parse_ignore_case_char(IT &first,IT last){
 
-    auto char_token = lex(first, last);
+    auto token = lex(first, last);
 
-    if(char_token !=  CHAR && char_token != DOT && char_token != REPEAT)
+    if(token !=  CHAR && token != DOT && token != REPEAT)
     {
         return nullptr;
     }
@@ -184,6 +184,11 @@ IgnoreCaseChar* parse_ignore_case_char(IT &first,IT last){
     auto p_char = new IgnoreCaseChar;
     p_char->ch=tolower(*first);
     first++;
+    if(*first == '\\')
+    {
+        first = first + 2;
+    }
+
     return p_char;
 }
 
@@ -237,6 +242,43 @@ IgnoreCaseGroup* parse_ignore_case_group(IT &first, IT last){
 }
 
 template<typename IT>
+IgnoreCaseCounter* parse_ignore_case_counter(IT &first, IT last){
+
+    first++;
+    auto token = lex(first, last);
+    if(token!= L_COUNTER)
+    {
+        return nullptr;
+    }
+
+    first--;
+    IgnoreCaseChar* p_char = parse_ignore_case_char(first,last);
+    first++;
+    auto p_counter = new IgnoreCaseCounter;
+    p_counter->add(p_char);
+
+    int tmp = std::stoi(&*first);
+    p_counter->counter = tmp;
+
+    first++;
+
+    auto token_RPAREN = lex(first, last);
+    first++;
+
+    if(token_RPAREN != R_COUNTER)
+    {
+        return nullptr;
+    }
+    if(*first == '\\')
+    {
+        first = first + 2;
+    }
+
+
+    return p_counter;
+}
+
+template<typename IT>
 IgnoreCaseString* parse_ignore_case_string(IT &first,IT last)
 {
     IgnoreCaseString* p_string = new IgnoreCaseString;
@@ -250,9 +292,18 @@ IgnoreCaseString* parse_ignore_case_string(IT &first,IT last)
         p_string->add(p_lhs);
     }
 
+    if(next_token == L_COUNTER)
+    {
+        p_lhs = parse_ignore_case_counter(first,last);
+        p_string->add(p_lhs);
+    }
+    else
+    {
+        p_lhs = parse_ignore_case_char(first,last);
+        p_string->add(p_lhs);
+    }
 
-    p_lhs = parse_ignore_case_char(first,last);
-    p_string->add(p_lhs);
+
 
 
     auto token = lex(first,last);

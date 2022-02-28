@@ -29,7 +29,9 @@ struct Char:ASTNode{
     char ch;
 
     bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
-        return ch == *first || ch == '.';
+
+        return(ch == (*first) || ch == '.');
+
 
     }
 
@@ -44,7 +46,8 @@ struct IgnoreCaseChar:ASTNode{
 
     bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
 
-        return ch == tolower(*first) || ch == '.';
+        return(ch == tolower(*first) || ch == '.');
+
     }
 
     std::string getNameFromNode() override{
@@ -86,6 +89,33 @@ struct IgnoreCaseString:ASTNode{
     std::string getNameFromNode() override{
         return "IGNORE_CASE_STRING";
     }
+};
+
+struct IgnoreCaseCounter:ASTNode{
+
+    int counter;
+
+    bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
+
+        bool lhs = false;
+
+        for(int i = 0; i < counter; i++)
+        {
+            lhs = children[0]->evaluate(first,last);
+            first++;
+        }
+        //pekarn hoppar ett steg för mkt
+        first--;
+
+        return lhs;
+    }
+
+    std::string getNameFromNode() override{
+
+        std::string return_counter = std::to_string(counter);
+        return "COUNTER " + return_counter;
+    }
+
 };
 
 struct IgnoreCase:ASTNode{
@@ -138,11 +168,12 @@ struct Repeat:ASTNode{
 
     bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
 
-        bool lhs = children[0]->evaluate(first,last);
+        bool lhs = false;
 
         while(children[0]->evaluate(first,last))
         {
             first++;
+            lhs = true;
         }
         //Pekarn hoppar ett steg för mkt
         first--;
@@ -318,16 +349,7 @@ struct Search:ASTNode{
             }
         }
         return false;
-        /*
-        for(auto child:children){
 
-            bool match = children[0]->evaluate(first,last);
-            if(!match) {
-                return false;
-            }
-        }
-        return true;
-        */
     }
 
 };

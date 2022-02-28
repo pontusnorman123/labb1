@@ -40,17 +40,13 @@ void printTree(ASTNode* node)
 int main(){
 
     //search string iterators
-    std::string search_string = "lo{2}lol";
+    std::string search_string = "lo* could.{3}";
     auto search_string_start = search_string.begin();
     auto search_string_end = search_string.end();
 
-    std::string input_text = "waterloolol";
+    std::string input_text = "Waterloo I was defeated, you won the war Waterloo promise to love you for ever more Waterloo couldn't escape if I wanted to Waterloo knowing my fate is to be with you Waterloo finally facing my Waterloo";
     std::string::iterator input_first = input_text.begin();
     std::string::iterator input_last = input_text.end();
-    //Input text iterators
-    //std::string input_text = "TEST THIS";
-    //auto input_text_start = input_text.begin();
-    //auto input_text_end = input_text.end();
 
 
     auto result = parse_search(search_string_start, search_string_end);
@@ -58,12 +54,13 @@ int main(){
 
     if(result->evaluate(input_first,input_last))
     {
-        std::cout<<"MATCH";
+        std::cout<<" MATCH";
     }
     else
     {
         std::cout<<"EJ MATCH";
     }
+
     std::cout<<std::endl;
 
     printTree(result);
