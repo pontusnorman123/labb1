@@ -147,12 +147,19 @@ struct IgnoreCaseRepeat:ASTNode{
 
     bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
 
-        bool lhs = children[0]->evaluate(first,last);
+        bool lhs = false;
+        std::string tmp;
 
-        while(children[0]->evaluate(first,last))
+
+        while(children[0]->evaluate(first,last) && first != last)
         {
+            tmp = search_result;
             first++;
+            lhs = true;
         }
+
+        search_result = tmp;
+
         //Pekarn hoppar ett steg för mkt
         first--;
 
@@ -187,7 +194,7 @@ struct Repeat:ASTNode{
 
         while(children[0]->evaluate(first,last) && first != last)
         {
-            //earch_result.push_back(*first);
+            //loopen orsakar alltid att search_result raderas så sparas temporärt
             tmp = search_result;
             first++;
             lhs = true;
@@ -336,6 +343,17 @@ struct Expr:ASTNode{
         return lhs && rhs;
     }
 
+};
+
+struct GroupOut:ASTNode{
+
+    bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
+
+    }
+
+    std::string getNameFromNode() override{
+        return "GROUP-OUT";
+    }
 };
 
 struct AllOut:ASTNode{

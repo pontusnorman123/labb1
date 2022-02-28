@@ -33,7 +33,7 @@ tokens lex(IT &first, IT last){
                 return IGNORE_CASE;
             }
             return CATCH_GROUP;
-            }
+        }
 
         default:
             return CHAR;

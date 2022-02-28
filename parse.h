@@ -3,6 +3,7 @@
 
 #include "nodes.h"
 #include "lex.h"
+
 //Dagen
 
 
@@ -205,6 +206,11 @@ IgnoreCaseRepeat* parse_ignore_repeat(IT &first, IT last){
     auto token = lex(first,last);
     IgnoreCaseString* p_rhs = nullptr;
 
+    if(*first == '\\')
+    {
+        first = first + 2;
+    }
+
     if(token != CHAR && token != DOT && token != REPEAT){
         p_repeat->add(p_rhs);
         return p_repeat;
@@ -397,19 +403,19 @@ Expr* parse_expression(IT &first, IT last){
 
     auto token = lex(first,last);
     auto p_expr = new Expr;
-    bool ignore = false;
+    bool ignore_case = false;
 
     for(auto i = first; i != last - 1; i++)
     {
         token = lex(i,last);
         if(token == IGNORE_CASE){
-            ignore = true;
+            ignore_case = true;
         }
     }
 
     token = lex(first,last);
 
-    if(ignore)
+    if(ignore_case)
     {
         IgnoreCaseExpr* p_ignore_case = parse_ignore_case_expr(first,last);
         p_expr->add(p_ignore_case);
@@ -449,7 +455,32 @@ Expr* parse_expression(IT &first, IT last){
 }
 
 template<typename IT>
-AllOut* parse_AllOut(IT &first, IT last){
+GroupOut* parse_group_out(IT &first, IT last, int pos){
+
+    if(pos == 0)
+    {
+
+    }
+
+    for(int i = 0; i != pos; i++, first++)
+    {
+        while(*first != '(')
+        {
+            first++;
+        }
+    }
+
+    ASTNode* p_group = parse_group(first,last);
+    auto p_group_out = new GroupOut;
+    p_group_out->add(p_group);
+
+
+    return p_group_out;
+
+}
+
+template<typename IT>
+AllOut* parse_all_out(IT &first, IT last){
 
     Expr* p_expr = nullptr;
     p_expr = parse_expression(first,last);
@@ -462,9 +493,32 @@ AllOut* parse_AllOut(IT &first, IT last){
 template<typename IT>
 Search *parse_search(IT &first, IT last){
 
-    AllOut* p_AllOut = parse_AllOut(first,last);
+    auto token = lex(first,last);
+    bool catch_case = false;
+    int group_pos;
+
+    for(auto i = first; i != last - 1; i++)
+    {
+        token = lex(i,last);
+        if(token == CATCH_GROUP){
+            catch_case = true;
+            group_pos = *(i + 3);
+        }
+    }
+
+    ASTNode* p_child = nullptr;
     auto p_search = new Search;
-    p_search->add(p_AllOut);
+
+    if(catch_case)
+    {
+        p_child = parse_group_out(first,last, group_pos);
+        p_search->add(p_child);
+    }
+    else
+    {
+        p_child = parse_all_out(first,last);
+        p_search->add(p_child);
+    }
 
     return p_search;
 }
