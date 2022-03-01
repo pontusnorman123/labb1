@@ -156,6 +156,8 @@ Group* parse_group(IT &first, IT last) {
         return nullptr;
     }
 
+
+
     String* p_string = nullptr;
     p_string = parse_string(first, last);
     auto p_group = new Group;
@@ -397,6 +399,25 @@ IgnoreCaseExpr* parse_ignore_case_expr(IT &first, IT last){
 }
 
 template<typename IT>
+Or* parse_or(IT &first, IT last){
+
+    first++;
+    String* p_lhs = parse_string(first,last);
+    first++;
+    String* p_rhs = parse_string(first,last);
+    first++;
+
+    Or* p_or = new Or;
+    p_or->add(p_lhs);
+    p_or->add(p_rhs);
+
+    return p_or;
+
+
+
+}
+
+template<typename IT>
 Expr* parse_expression(IT &first, IT last){
 
     String* p_string = nullptr;
@@ -428,8 +449,30 @@ Expr* parse_expression(IT &first, IT last){
     token = lex(first,last);
 
     if(token == L_PAREN) {
-        Group* p_group = parse_group(first,last);
-        p_expr->add(p_group);
+
+        bool or_case = false;
+        for(auto i = first; i != last - 1; i++)
+        {
+            token = lex(i,last);
+            if(token == OR){
+               or_case = true;
+               break;
+            }
+        }
+
+        ASTNode* p_lhs = nullptr;
+
+        if(or_case)
+        {
+            p_lhs = parse_or(first,last);
+            p_expr->add(p_lhs);
+        }
+        else
+        {
+            p_lhs = parse_group(first,last);
+            p_expr->add(p_lhs);
+        }
+
     }
 
     token = lex(first,last);
@@ -448,11 +491,6 @@ Expr* parse_expression(IT &first, IT last){
     return p_expr;
 }
 
-template<typename IT>
-Or* parse_or(IT &first, IT last){
-
-
-}
 
 template<typename IT>
 GroupOut* parse_group_out(IT &first, IT last, int pos){

@@ -6,7 +6,7 @@
 #include <ctype.h>
 
 
-enum tokens{CHAR, L_PAREN, R_PAREN, END, DOT, REPEAT, IGNORE_CASE, CATCH_GROUP, L_COUNTER, R_COUNTER};
+enum tokens{CHAR, L_PAREN, R_PAREN, END, DOT, REPEAT, IGNORE_CASE, CATCH_GROUP, L_COUNTER, R_COUNTER, OR};
 
 
 template<typename IT>
@@ -27,6 +27,9 @@ tokens lex(IT &first, IT last){
             return L_COUNTER;
         case '}':
             return R_COUNTER;
+        case '+':
+            return OR;
+
         case '\\': {
 
             if (*(first + 1) == 'I') {
