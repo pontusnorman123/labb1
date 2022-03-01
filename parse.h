@@ -449,6 +449,12 @@ Expr* parse_expression(IT &first, IT last){
 }
 
 template<typename IT>
+Or* parse_or(IT &first, IT last){
+
+
+}
+
+template<typename IT>
 GroupOut* parse_group_out(IT &first, IT last, int pos){
 
     ASTNode* p_child = nullptr;

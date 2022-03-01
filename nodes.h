@@ -345,6 +345,17 @@ struct Expr:ASTNode{
 
 };
 
+struct Or:ASTNode{
+
+    bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
+
+    }
+
+    std::string getNameFromNode() override{
+
+    }
+};
+
 struct GroupOut:ASTNode{
 
     bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
