@@ -400,10 +400,92 @@ template<typename IT>
 Expr* parse_expression(IT &first, IT last){
 
     String* p_string = nullptr;
+    auto p_expr = new Expr;
 
     auto token = lex(first,last);
-    auto p_expr = new Expr;
+
+
+    if(token == CHAR || token == DOT)
+    {
+        p_string = parse_string(first,last);
+        p_expr->add(p_string);
+
+        token = lex(first,last);
+
+        if(token == CATCH_GROUP)
+        {
+            return p_expr;
+        }
+
+        if(token != END)
+        {
+            Expr* p_rhs = parse_expression(first,last);
+            p_expr->add(p_rhs);
+        }
+
+    }
+
+    token = lex(first,last);
+
+    if(token == L_PAREN) {
+        Group* p_group = parse_group(first,last);
+        p_expr->add(p_group);
+    }
+
+    token = lex(first,last);
+
+    if(token == CATCH_GROUP)
+    {
+        return p_expr;
+    }
+
+    if(token != END){
+        Expr *p_rhs = parse_expression(first,last);
+        p_expr->add(p_rhs);
+    }
+
+
+    return p_expr;
+}
+
+template<typename IT>
+GroupOut* parse_group_out(IT &first, IT last, int pos){
+
+    ASTNode* p_child = nullptr;
+    auto p_group_out = new GroupOut;
+    if(pos == 0)
+    {
+        p_child = parse_expression(first,last);
+        p_group_out->add(p_child);
+
+    }
+    else
+    {
+        for(int i = 0; i < pos; i++, first++)
+        {
+            while(*first != '(')
+            {
+                first++;
+            }
+        }
+        //Hoppar ett för mkt
+        first--;
+
+        ASTNode* p_group = parse_group(first,last);
+        p_group_out->add(p_group);
+    }
+
+
+    return p_group_out;
+
+}
+
+template<typename IT>
+AllOut* parse_all_out(IT &first, IT last){
+
+    auto token = lex(first,last);
     bool ignore_case = false;
+    auto p_all_out = new AllOut;
 
     for(auto i = first; i != last - 1; i++)
     {
@@ -418,76 +500,17 @@ Expr* parse_expression(IT &first, IT last){
     if(ignore_case)
     {
         IgnoreCaseExpr* p_ignore_case = parse_ignore_case_expr(first,last);
-        p_expr->add(p_ignore_case);
+        p_all_out->add(p_ignore_case);
     }
     else
     {
-        if(token == CHAR || token == DOT)
-        {
-            p_string = parse_string(first,last);
-            p_expr->add(p_string);
-
-            token = lex(first,last);
-            if(token != END)
-            {
-                Expr* p_rhs = parse_expression(first,last);
-                p_expr->add(p_rhs);
-            }
-
-        }
-
-        token = lex(first,last);
-
-        if(token == L_PAREN) {
-            Group* p_group = parse_group(first,last);
-            p_expr->add(p_group);
-        }
-
-        token = lex(first,last);
-        Expr * p_rhs = nullptr;
-        if(token != END){
-            p_rhs = parse_expression(first,last);
-            p_expr->add(p_rhs);
-        }
+        Expr* p_expr = nullptr;
+        p_expr = parse_expression(first,last);
+        p_all_out->add(p_expr);
     }
 
-    return p_expr;
-}
 
-template<typename IT>
-GroupOut* parse_group_out(IT &first, IT last, int pos){
-
-    if(pos == 0)
-    {
-
-    }
-
-    for(int i = 0; i != pos; i++, first++)
-    {
-        while(*first != '(')
-        {
-            first++;
-        }
-    }
-
-    ASTNode* p_group = parse_group(first,last);
-    auto p_group_out = new GroupOut;
-    p_group_out->add(p_group);
-
-
-    return p_group_out;
-
-}
-
-template<typename IT>
-AllOut* parse_all_out(IT &first, IT last){
-
-    Expr* p_expr = nullptr;
-    p_expr = parse_expression(first,last);
-    auto p_AllOut = new AllOut;
-    p_AllOut->add(p_expr);
-
-    return p_AllOut;
+    return p_all_out;
 };
 
 template<typename IT>
@@ -502,7 +525,8 @@ Search *parse_search(IT &first, IT last){
         token = lex(i,last);
         if(token == CATCH_GROUP){
             catch_case = true;
-            group_pos = *(i + 3);
+            i = i + 3;
+            group_pos = std::stoi(&*i);
         }
     }
 

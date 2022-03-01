@@ -349,6 +349,7 @@ struct GroupOut:ASTNode{
 
     bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
 
+        return children[0]->evaluate(first,last);
     }
 
     std::string getNameFromNode() override{
