@@ -132,6 +132,29 @@ struct IgnoreCaseCounter:ASTNode{
 
 };
 
+struct IgnoreCaseOr:ASTNode{
+
+    bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
+
+        auto tmp = search_result;
+
+        bool lhs = children[0]->evaluate(first,last);
+
+        if(lhs)
+        {
+            return true;
+        }
+
+        search_result = tmp;
+        return children[1]->evaluate(first,last);
+
+    }
+
+    std::string getNameFromNode() override{
+        return "IGNORE-CASE-OR";
+    }
+};
+
 struct IgnoreCase:ASTNode{
 
     bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
