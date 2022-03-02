@@ -17,9 +17,6 @@ template<typename IT>
 Expr* parse_expression(IT &first, IT last);
 
 template<typename IT>
-Expr* parse_expression(IT &first, IT last);
-
-template<typename IT>
 IgnoreCaseString* parse_ignore_case_string(IT &first,IT last);
 
 template<typename IT>
@@ -102,6 +99,7 @@ String* parse_string(IT &first, IT last){
 
     auto tmp = first;
     auto next_token = lex(++tmp, last);
+
     if(next_token == REPEAT)
     {
         p_lhs = parse_repeat(first,last);
@@ -118,11 +116,6 @@ String* parse_string(IT &first, IT last){
         p_lhs = parse_char(first,last);
         p_string->add(p_lhs);
     }
-
-    /*
-    p_lhs = parse_char(first,last);
-    p_string->add(p_lhs);
-    */
 
     auto token = lex(first,last);
     ASTNode* p_rhs = nullptr;
@@ -190,10 +183,13 @@ IgnoreCaseChar* parse_ignore_case_char(IT &first,IT last){
     auto p_char = new IgnoreCaseChar;
     p_char->ch=tolower(*first);
     first++;
+
+    /*
     if(*first == '\\')
     {
         first = first + 2;
     }
+    */
 
     return p_char;
 }
@@ -296,14 +292,15 @@ IgnoreCaseString* parse_ignore_case_string(IT &first,IT last)
     ASTNode* p_lhs;
 
     auto tmp = first;
-    auto next_token = lex(++tmp, last);
-    if(next_token == REPEAT)
+    auto token = lex(++tmp, last);
+
+    if(token == REPEAT)
     {
         p_lhs = parse_ignore_repeat(first,last);
         p_string->add(p_lhs);
     }
 
-    if(next_token == L_COUNTER)
+    if(token == L_COUNTER)
     {
         p_lhs = parse_ignore_case_counter(first,last);
         p_string->add(p_lhs);
@@ -314,10 +311,13 @@ IgnoreCaseString* parse_ignore_case_string(IT &first,IT last)
         p_string->add(p_lhs);
     }
 
+    if(*first == '\\')
+    {
+        first = first + 2;
+        return p_string;
+    }
 
-
-
-    auto token = lex(first,last);
+    token = lex(first,last);
     ASTNode* p_rhs = nullptr;
 
     if(token != CHAR && token != DOT && token != REPEAT){
@@ -326,7 +326,7 @@ IgnoreCaseString* parse_ignore_case_string(IT &first,IT last)
     }
 
     tmp = first;
-    next_token = lex(++tmp, last);
+    auto next_token = lex(++tmp, last);
     if(next_token == REPEAT)
     {
         p_lhs = parse_ignore_repeat(first,last);
@@ -339,6 +339,7 @@ IgnoreCaseString* parse_ignore_case_string(IT &first,IT last)
     }
 
 
+
     return p_string;
 }
 
@@ -346,7 +347,7 @@ IgnoreCaseString* parse_ignore_case_string(IT &first,IT last)
 template<typename IT>
 IgnoreCaseExpr* parse_ignore_case_expr(IT &first, IT last){
 
-    IgnoreCaseString* p_string = nullptr;
+    IgnoreCaseString* p_string;
 
     auto token = lex(first,last);
     auto p_expr = new IgnoreCaseExpr;
@@ -357,13 +358,14 @@ IgnoreCaseExpr* parse_ignore_case_expr(IT &first, IT last){
         p_string = parse_ignore_case_string(first,last);
         p_expr->add(p_string);
 
+        /*
         token = lex(first,last);
         if(token != END)
         {
             IgnoreCaseExpr* p_rhs = parse_ignore_case_expr(first,last);
             p_expr->add(p_rhs);
         }
-
+        */
     }
 
     token = lex(first,last);
@@ -374,17 +376,19 @@ IgnoreCaseExpr* parse_ignore_case_expr(IT &first, IT last){
     }
 
     token = lex(first,last);
-    Expr * p_rhs = nullptr;
+    Expr* p_rhs = nullptr;
 
     if(*first == '\\')
     {
         first = first + 2;
     }
 
+
     if(token != END){
         p_rhs = parse_expression(first,last);
         p_expr->add(p_rhs);
     }
+
 
 
     return p_expr;
@@ -417,6 +421,24 @@ Expr* parse_expression(IT &first, IT last){
     auto p_expr = new Expr;
 
     auto token = lex(first,last);
+    bool ignore_case = false;
+
+    for(auto i = first; i != last - 1; i++)
+    {
+        token = lex(i,last);
+        if(token == IGNORE_CASE){
+            ignore_case = true;
+        }
+    }
+
+    token = lex(first,last);
+
+    if(ignore_case)
+    {
+        IgnoreCaseExpr* p_ignore_case = parse_ignore_case_expr(first,last);
+        p_expr->add(p_ignore_case);
+        return p_expr;
+    }
 
 
     if(token == CHAR || token == DOT)
@@ -524,27 +546,10 @@ AllOut* parse_all_out(IT &first, IT last){
     bool ignore_case = false;
     auto p_all_out = new AllOut;
 
-    for(auto i = first; i != last - 1; i++)
-    {
-        token = lex(i,last);
-        if(token == IGNORE_CASE){
-            ignore_case = true;
-        }
-    }
+    Expr* p_expr = nullptr;
+    p_expr = parse_expression(first,last);
+    p_all_out->add(p_expr);
 
-    token = lex(first,last);
-
-    if(ignore_case)
-    {
-        IgnoreCaseExpr* p_ignore_case = parse_ignore_case_expr(first,last);
-        p_all_out->add(p_ignore_case);
-    }
-    else
-    {
-        Expr* p_expr = nullptr;
-        p_expr = parse_expression(first,last);
-        p_all_out->add(p_expr);
-    }
 
 
     return p_all_out;

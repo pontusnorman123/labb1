@@ -40,7 +40,7 @@ void printTree(ASTNode* node)
 int main(){
 
     //search string iterators
-    std::string search_string = "promise to (love+Hate)";
+    std::string search_string = "W(A)\\I";
     auto search_string_start = search_string.begin();
     auto search_string_end = search_string.end();
 
@@ -52,7 +52,7 @@ int main(){
 
     auto result = parse_search(search_string_start, search_string_end);
 
-
+    /*
     if(result->evaluate(input_first,input_last))
     {
         std::cout<<" MATCH";
@@ -61,7 +61,7 @@ int main(){
     {
         std::cout<<"EJ MATCH";
     }
-
+    */
     std::cout<<std::endl;
 
     printTree(result);
