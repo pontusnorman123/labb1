@@ -343,54 +343,9 @@ IgnoreCaseString* parse_ignore_case_string(IT &first,IT last)
     return p_string;
 }
 
-/*
-template<typename IT>
-IgnoreCaseExpr* parse_ignore_case_expr(IT &first, IT last){
-
-    IgnoreCaseString* p_string;
-
-    auto token = lex(first,last);
-    auto p_expr = new IgnoreCaseExpr;
-
-
-    if(token == CHAR || token == DOT)
-    {
-        p_string = parse_ignore_case_string(first,last);
-        p_expr->add(p_string);
-
-    }
-
-    token = lex(first,last);
-
-    if(token == L_PAREN) {
-        IgnoreCaseGroup* p_group = parse_ignore_case_group(first,last);
-        p_expr->add(p_group);
-    }
-
-    token = lex(first,last);
-    Expr* p_rhs = nullptr;
-
-    if(*first == '\\')
-    {
-        first = first + 2;
-    }
-
-
-    if(token != END){
-        p_rhs = parse_expression(first,last);
-        p_expr->add(p_rhs);
-    }
-
-
-
-    return p_expr;
-
-}
-*/
 template<typename IT>
 Or* parse_or(IT &first, IT last){
 
-    first++;
     String* p_lhs = parse_string(first,last);
     first++;
     String* p_rhs = parse_string(first,last);
@@ -409,7 +364,6 @@ Or* parse_or(IT &first, IT last){
 template<typename IT>
 IgnoreCaseOr* parse_ignore_case_or(IT &first, IT last)
 {
-    first++;
     IgnoreCaseString* p_lhs = parse_ignore_case_string(first,last);
     first++;
     IgnoreCaseString* p_rhs = parse_ignore_case_string(first,last);
@@ -426,6 +380,7 @@ template<typename IT>
 Expr* parse_expression(IT &first, IT last){
 
     ASTNode* p_string;
+    ASTNode* p_lhs;
     auto p_expr = new Expr;
 
     auto token = lex(first,last);
@@ -433,8 +388,55 @@ Expr* parse_expression(IT &first, IT last){
     if(token == CHAR || token == DOT)
     {
 
-        bool ignore_case_string = false;
 
+        bool or_case = false;
+        bool or_ignore_case = false;
+
+        auto i = first;
+        while (token == CHAR)
+        {
+            token = lex(i,last);
+            i++;
+        }
+        if(token == OR)
+        {
+            i++;
+            token = lex(i,last);
+            while(token == CHAR)
+            {
+                token = lex(i,last);
+                i++;
+            }
+            if(token == IGNORE_CASE)
+            {
+                p_lhs = parse_ignore_case_or(first,last);
+                p_expr->add(p_lhs);
+                token = lex(first,last);
+                if(token != END)
+                {
+                    Expr* p_rhs = parse_expression(first,last);
+                    p_expr->add(p_rhs);
+                }
+                return p_expr;
+            }
+            else
+            {
+                p_lhs = parse_or(first,last);
+                p_expr->add(p_lhs);
+                token = lex(first,last);
+                if(token != END)
+                {
+                    Expr* p_rhs = parse_expression(first,last);
+                    p_expr->add(p_rhs);
+                }
+                return p_expr;
+            }
+
+        }
+
+
+        bool ignore_case_string = false;
+        token = lex(first,last);
         for(auto i = first; token == CHAR ; i++)
         {
             token = lex(i,last);
@@ -477,7 +479,7 @@ Expr* parse_expression(IT &first, IT last){
         bool or_case = false;
         bool or_ignore_case = false;
         auto i = first;
-        ASTNode* p_lhs;
+
 
         while(token != R_PAREN) {
             token = lex(i, last);
@@ -494,6 +496,7 @@ Expr* parse_expression(IT &first, IT last){
 
         if(or_ignore_case)
         {
+            first++;
             p_lhs = parse_ignore_case_or(first,last);
             p_expr->add(p_lhs);
             token = lex(first,last);
@@ -505,6 +508,7 @@ Expr* parse_expression(IT &first, IT last){
         }
         else if(or_case)
         {
+            first++;
             p_lhs = parse_or(first,last);
             p_expr->add(p_lhs);
             token = lex(first,last);
