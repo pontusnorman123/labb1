@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/Min_Kladd.iml" filepath="$PROJECT_DIR$/.idea/Min_Kladd.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/labb1.iml" filepath="$PROJECT_DIR$/.idea/labb1.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/labb12.iml" filepath="$PROJECT_DIR$/.idea/labb12.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/labb13.iml" filepath="$PROJECT_DIR$/.idea/labb13.iml" />
