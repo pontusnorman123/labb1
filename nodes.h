@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-std::vector<std::string> search_result;
+std::string search_result;
 
 struct ASTNode{
 
@@ -30,7 +30,14 @@ struct Char:ASTNode{
 
     bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
 
-        return(ch == (*first) || ch == '.');
+
+        if(ch == (*first) || ch == '.')
+        {
+            search_result.push_back(*first);
+            return true;
+        }
+        search_result.clear();
+        return false;
 
 
     }
@@ -46,7 +53,14 @@ struct IgnoreCaseChar:ASTNode{
 
     bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
 
-        return(ch == tolower(*first) || ch == '.');
+        char lower_ch = tolower(*first);
+        if(ch == lower_ch || ch == '.')
+        {
+            search_result.push_back(lower_ch);
+            return true;
+        }
+        search_result.clear();
+        return false;
 
     }
 
@@ -133,12 +147,19 @@ struct IgnoreCaseRepeat:ASTNode{
 
     bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
 
-        bool lhs = children[0]->evaluate(first,last);
+        bool lhs = false;
+        std::string tmp;
 
-        while(children[0]->evaluate(first,last))
+
+        while(children[0]->evaluate(first,last) && first != last)
         {
+            tmp = search_result;
             first++;
+            lhs = true;
         }
+
+        search_result = tmp;
+
         //Pekarn hoppar ett steg för mkt
         first--;
 
@@ -166,15 +187,21 @@ struct IgnoreCaseRepeat:ASTNode{
 
 struct Repeat:ASTNode{
 
-    bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
+    bool evaluate(std::string::iterator &first, std::string::const_iterator last) override {
 
         bool lhs = false;
+        std::string tmp;
 
-        while(children[0]->evaluate(first,last))
+        while(children[0]->evaluate(first,last) && first != last)
         {
+            //loopen orsakar alltid att search_result raderas så sparas temporärt
+            tmp = search_result;
             first++;
             lhs = true;
         }
+
+        search_result = tmp;
+
         //Pekarn hoppar ett steg för mkt
         first--;
 
@@ -248,7 +275,7 @@ struct Counter:ASTNode{
     std::string getNameFromNode() override{
 
         std::string return_counter = std::to_string(counter);
-        return "COUNTER " + return_counter;
+        return "COUNTER (" + return_counter + ")";
     }
 };
 
@@ -318,6 +345,41 @@ struct Expr:ASTNode{
 
 };
 
+struct Or:ASTNode{
+
+    bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
+
+        auto tmp = search_result;
+
+        bool lhs = children[0]->evaluate(first,last);
+
+        if(lhs)
+        {
+            return true;
+        }
+
+        search_result = tmp;
+        return children[1]->evaluate(first,last);
+
+    }
+
+    std::string getNameFromNode() override{
+        return "OR";
+    }
+};
+
+struct GroupOut:ASTNode{
+
+    bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
+
+        return children[0]->evaluate(first,last);
+    }
+
+    std::string getNameFromNode() override{
+        return "GROUP-OUT";
+    }
+};
+
 struct AllOut:ASTNode{
 
     std::string getNameFromNode() override{
@@ -337,7 +399,6 @@ struct Search:ASTNode{
         return "SEARCH";
     }
 
-
     bool evaluate(std::string::iterator &first, std::string::const_iterator last) override{
 
         for(auto it = first; it != last; it++)
@@ -345,6 +406,7 @@ struct Search:ASTNode{
             first = it;
             if(children[0]->evaluate(first,last))
             {
+                std::cout<<search_result;
                 return true;
             }
         }

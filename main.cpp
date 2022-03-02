@@ -40,11 +40,12 @@ void printTree(ASTNode* node)
 int main(){
 
     //search string iterators
-    std::string search_string = "waterloo\\I i was";
+    std::string search_string = "promise to (love+Hate)";
     auto search_string_start = search_string.begin();
     auto search_string_end = search_string.end();
 
     std::string input_text = "Waterloo I was defeated, you won the war Waterloo promise to love you for ever more Waterloo couldn't escape if I wanted to Waterloo knowing my fate is to be with you Waterloo finally facing my Waterloo";
+
     std::string::iterator input_first = input_text.begin();
     std::string::iterator input_last = input_text.end();
 
@@ -66,7 +67,8 @@ int main(){
     printTree(result);
 
 
-    //Input test example "lo* could.{3}"*/
+    //Waterloo I was defeated, you won the war Waterloo promise to love you for ever more Waterloo couldn't esc"
+    //                             "ape if I wanted to Waterloo knowing my fate is to be with you Waterloo finally facing my Waterloo"
 
 
 }
