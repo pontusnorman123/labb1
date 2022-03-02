@@ -16,6 +16,9 @@ template<typename IT>
 Expr* parse_expression(IT &first, IT last);
 
 template<typename IT>
+Expr* parse_expression(IT &first, IT last);
+
+template<typename IT>
 IgnoreCaseString* parse_ignore_case_string(IT &first,IT last);
 
 template<typename IT>
@@ -333,16 +336,6 @@ IgnoreCaseString* parse_ignore_case_string(IT &first,IT last)
 
 
 template<typename IT>
-IgnoreCase* parse_ignore_case(IT &first, IT last){
-
-    IgnoreCase* p_ignore= new IgnoreCase;
-    auto p_string = parse_ignore_case_expr(first,last);
-    p_ignore->add(p_string);
-
-    return p_ignore;
-}
-
-template<typename IT>
 IgnoreCaseExpr* parse_ignore_case_expr(IT &first, IT last){
 
     IgnoreCaseString* p_string = nullptr;
@@ -373,15 +366,15 @@ IgnoreCaseExpr* parse_ignore_case_expr(IT &first, IT last){
     }
 
     token = lex(first,last);
-    IgnoreCaseExpr * p_rhs = nullptr;
+    Expr * p_rhs = nullptr;
 
     if(*first == '\\')
     {
-        return p_expr;
+        first = first + 2;
     }
 
     if(token != END){
-        p_rhs = parse_ignore_case_expr(first,last);
+        p_rhs = parse_expression(first,last);
         p_expr->add(p_rhs);
     }
 

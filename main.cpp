@@ -40,7 +40,7 @@ void printTree(ASTNode* node)
 int main(){
 
     //search string iterators
-    std::string search_string = "lo* could.{3}";
+    std::string search_string = "waterloo\\I i was";
     auto search_string_start = search_string.begin();
     auto search_string_end = search_string.end();
 
