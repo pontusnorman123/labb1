@@ -358,14 +358,6 @@ IgnoreCaseExpr* parse_ignore_case_expr(IT &first, IT last){
         p_string = parse_ignore_case_string(first,last);
         p_expr->add(p_string);
 
-        /*
-        token = lex(first,last);
-        if(token != END)
-        {
-            IgnoreCaseExpr* p_rhs = parse_ignore_case_expr(first,last);
-            p_expr->add(p_rhs);
-        }
-        */
     }
 
     token = lex(first,last);
