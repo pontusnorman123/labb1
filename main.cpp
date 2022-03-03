@@ -2,6 +2,8 @@
 #include "parse.h"
 #include "nodes.h"
 #include <iostream>
+#include <string>
+#include<stdio.h>
 //Dagen
 
 
@@ -39,7 +41,17 @@ void printTree(ASTNode* node)
 
 int main(){
 
-    //search string iterators
+    /*
+    // För att ange i terminalen vad man söker.
+    // Observera att det räcker med ett st "\" inte två som cpp kräver.
+    std::string name;
+    char nm[20];
+    gets(nm);
+    std::cout<<nm<<std::endl;
+    std::string search_string = nm;
+    */
+
+    // Kommentera bort för att ovanstående ska fungera.
     std::string search_string = "Love+Hate\\I";
     auto search_string_start = search_string.begin();
     auto search_string_end = search_string.end();
