@@ -52,7 +52,7 @@ int main(){
     */
 
     // Kommentera bort för att ovanstående ska fungera.
-    std::string search_string = "Love+Hate\\I";
+    std::string search_string = "(Wat)(er)\\O{1}";
     auto search_string_start = search_string.begin();
     auto search_string_end = search_string.end();
 

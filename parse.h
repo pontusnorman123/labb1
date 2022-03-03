@@ -154,10 +154,14 @@ Group* parse_group(IT &first, IT last) {
 
 
 
-    String* p_string = nullptr;
-    p_string = parse_string(first, last);
+    //String* p_string = nullptr;
+    //p_string = parse_string(first, last);
+
+    Expr* p_expr = parse_expression(first,last);
     auto p_group = new Group;
-    p_group->add(p_string);
+
+    //p_group->add(p_string);
+    p_group->add(p_expr);
     auto token_RPAREN = lex(first, last);
     first++;
 
@@ -459,7 +463,7 @@ Expr* parse_expression(IT &first, IT last){
 
         token = lex(first,last);
 
-        if(token == CATCH_GROUP)
+        if(token == CATCH_GROUP || token == R_PAREN)
         {
             return p_expr;
         }
@@ -546,7 +550,7 @@ Expr* parse_expression(IT &first, IT last){
 
     token = lex(first,last);
 
-    if(token == CATCH_GROUP)
+    if(token == CATCH_GROUP || token == R_PAREN)
     {
         return p_expr;
     }
